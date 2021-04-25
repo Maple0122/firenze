@@ -49,4 +49,8 @@ public class Player {
     public void check() {
         this.bet(0);
     }
+
+    public void allIn() {
+        this.bet(this.amount);
+    }
 }

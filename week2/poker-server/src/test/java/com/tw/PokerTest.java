@@ -2,6 +2,7 @@ package com.tw;
 
 import com.tw.domain.Player;
 import static com.tw.domain.PlayerStatus.OFFLINE;
+import static com.tw.domain.PlayerStatus.ONLINE;
 import com.tw.domain.Poker;
 import org.junit.jupiter.api.Test;
 
@@ -125,5 +126,26 @@ public class PokerTest {
 
         // Then
         assertThat(poker.getAmountOfPot()).isEqualTo(110);
+    }
+
+    @Test
+    void should_pot_is_130_and_player_coin_is_0_and_online_when_player_all_in_given_four_player_and_a_poker() {
+        // Given
+        Poker poker = new Poker(PLAYER_SIZE);
+        Player dealer = new Player(1, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player smallBlind = new Player(2, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player bigBlind = new Player(3, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player player = new Player(4, AMOUNT_FOR_EACH_PLAYER, poker);
+
+        // When
+        smallBlind.bet(10);
+        bigBlind.bet(20);
+        player.allIn();
+        dealer.fold();
+
+        // Then
+        assertThat(poker.getAmountOfPot()).isEqualTo(130);
+        assertThat(player.getAmount()).isEqualTo(0);
+        assertThat(player.getStatus()).isEqualTo(ONLINE);
     }
 }
