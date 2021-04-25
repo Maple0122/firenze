@@ -62,11 +62,11 @@ public class Player {
         this.coinOfPotWhenAllIn = this.poker.getPotCoin();
     }
 
-    public Integer calculateWinAmount() {
+    public Integer calculateWinCoin() {
         return this.poker.getPotCoin() - this.poker.getPot().get(this.id);
     }
 
-    public Integer calculateWinAmountForAllInPlayer() {
+    public Integer calculateWinCoinOfAllInPlayer() {
         return this.coinOfPotWhenAllIn - this.initCoin;
     }
 }

@@ -170,7 +170,7 @@ public class PokerTest {
         // Then
         assertThat(poker.getPotCoin()).isEqualTo(90);
         assertThat(poker.getWinnerIds().get(0)).isEqualTo(2);
-        assertThat(smallBlind.calculateWinAmount()).isEqualTo(40);
+        assertThat(smallBlind.calculateWinCoin()).isEqualTo(40);
     }
 
     @Test
@@ -193,7 +193,7 @@ public class PokerTest {
 
         // Then
         assertThat(poker.getPotCoin()).isEqualTo(300);
-        assertThat(player.calculateWinAmountForAllInPlayer()).isEqualTo(30);
-        assertThat(bigBlind.calculateWinAmountForAllInPlayer() - player.getCoinOfPotWhenAllIn()).isEqualTo(70);
+        assertThat(player.calculateWinCoinOfAllInPlayer()).isEqualTo(30);
+        assertThat(bigBlind.calculateWinCoinOfAllInPlayer() - player.getCoinOfPotWhenAllIn()).isEqualTo(70);
     }
 }
