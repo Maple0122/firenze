@@ -45,4 +45,8 @@ public class Player {
         this.poker = null;
         this.status = OFFLINE;
     }
+
+    public void check() {
+        this.bet(0);
+    }
 }

@@ -103,4 +103,27 @@ public class PokerTest {
         assertThat(player.getAmount()).isEqualTo(80);
         assertThat(player.getStatus()).isEqualTo(OFFLINE);
     }
+
+    @Test
+    void should_pot_is_110_when_first_player_check_on_flop_given_four_player_and_a_poker() {
+        // Given
+        Poker poker = new Poker(PLAYER_SIZE);
+        Player dealer = new Player(1, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player smallBlind = new Player(2, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player bigBlind = new Player(3, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player player = new Player(4, AMOUNT_FOR_EACH_PLAYER, poker);
+
+        // When
+        smallBlind.bet(10);
+        bigBlind.bet(20);
+        player.call();
+        dealer.call();
+        smallBlind.check();
+        bigBlind.check();
+        player.bet(20);
+        dealer.call();
+
+        // Then
+        assertThat(poker.getAmountOfPot()).isEqualTo(110);
+    }
 }
