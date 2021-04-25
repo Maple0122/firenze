@@ -58,4 +58,25 @@ public class PokerTest {
         // Then
         assertThat(poker.getAmountOfPot()).isEqualTo(70);
     }
+
+    @Test
+    void should_pot_is_80_when_raise_given_four_player_and_a_poker() {
+        // Given
+        Poker poker = new Poker(PLAYER_SIZE);
+        Player dealer = new Player(1, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player smallBlind = new Player(2, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player bigBlind = new Player(3, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player player = new Player(4, AMOUNT_FOR_EACH_PLAYER, poker);
+
+        // When
+        smallBlind.bet(5);
+        bigBlind.bet(10);
+        player.raise(10);
+        dealer.call();
+        smallBlind.call();
+        bigBlind.call();
+
+        // Then
+        assertThat(poker.getAmountOfPot()).isEqualTo(80);
+    }
 }
