@@ -11,20 +11,22 @@ public class PokerTest {
     private static final int PLAYER_SIZE = 4;
 
     @Test
-    void should_pot_is_10_when_bet_10_given_a_player_and_a_poker() {
+    void should_pot_is_30_when_bet_given_two_player_and_a_poker() {
         // Given
         Poker poker = new Poker(PLAYER_SIZE);
-        Player player = new Player(1, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player smallBlind = new Player(2, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player bigBlind = new Player(3, AMOUNT_FOR_EACH_PLAYER, poker);
 
         // When
-        player.bet(10);
+        smallBlind.bet(10);
+        smallBlind.bet(20);
 
         // Then
-        assertThat(poker.getAmountOfPot()).isEqualTo(10);
+        assertThat(poker.getAmountOfPot()).isEqualTo(30);
     }
 
     @Test
-    void should_pot_is_50_when_player_call_given_a_player_and_a_poker() {
+    void should_pot_is_50_when_player_call_given_three_player_and_a_poker() {
         // Given
         Poker poker = new Poker(PLAYER_SIZE);
         Player smallBlind = new Player(2, AMOUNT_FOR_EACH_PLAYER, poker);
@@ -38,5 +40,22 @@ public class PokerTest {
 
         // Then
         assertThat(poker.getAmountOfPot()).isEqualTo(50);
+    }
+
+    @Test
+    void should_pot_is_70_when_raise_given_three_player_and_a_poker() {
+        // Given
+        Poker poker = new Poker(PLAYER_SIZE);
+        Player smallBlind = new Player(2, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player bigBlind = new Player(3, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player player = new Player(4, AMOUNT_FOR_EACH_PLAYER, poker);
+
+        // When
+        smallBlind.bet(10);
+        bigBlind.bet(20);
+        player.raise(20);
+
+        // Then
+        assertThat(poker.getAmountOfPot()).isEqualTo(70);
     }
 }

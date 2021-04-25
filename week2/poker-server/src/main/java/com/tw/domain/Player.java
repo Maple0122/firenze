@@ -27,6 +27,13 @@ public class Player {
         this.amount -= coin;
         Integer betAmount = poker.getPot().get(this.id);
         poker.setMaximumBetAmount(betAmount + coin);
-        poker.getPot().put(this.id, betAmount + coin);
+        poker.getPot().put(this.id, poker.getMaximumBetAmount());
+    }
+
+    public void raise(Integer addCoin) {
+        Integer betAmount = poker.getPot().get(this.id);
+        poker.setMaximumBetAmount(poker.getMaximumBetAmount() + addCoin);
+        this.amount -= (poker.getMaximumBetAmount() - betAmount);
+        poker.getPot().put(this.id, poker.getMaximumBetAmount());
     }
 }
