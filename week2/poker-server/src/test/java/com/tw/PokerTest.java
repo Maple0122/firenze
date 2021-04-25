@@ -4,7 +4,6 @@ import com.tw.domain.Player;
 import com.tw.domain.Poker;
 import org.junit.jupiter.api.Test;
 
-import static com.tw.domain.PlayerStatus.PASS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PokerTest {
