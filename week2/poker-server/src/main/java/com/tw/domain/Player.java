@@ -4,12 +4,10 @@ import static com.tw.domain.PlayerStatus.OFFLINE;
 import static com.tw.domain.PlayerStatus.ONLINE;
 import lombok.Getter;
 
-import static java.lang.Math.subtractExact;
-
 @Getter
 public class Player {
     private final Integer id;
-    private Poker poker;
+    private final Poker poker;
     private Integer amount;
     private PlayerStatus status;
 
@@ -22,8 +20,9 @@ public class Player {
 
     public void call() {
         Integer betAmount = poker.getPot().get(this.id);
-        int callAmount = subtractExact(poker.getMaximumBetAmount(), betAmount);
-        this.amount = subtractExact(this.amount, callAmount);
+        int callAmount = poker.getMaximumBetAmount() - betAmount;
+        this.amount -= callAmount;
+        poker.addAmountOfPot(callAmount);
         poker.getPot().put(this.id, poker.getMaximumBetAmount());
     }
 
@@ -31,6 +30,7 @@ public class Player {
         this.amount -= coin;
         Integer betAmount = poker.getPot().get(this.id);
         poker.setMaximumBetAmount(betAmount + coin);
+        poker.addAmountOfPot(coin);
         poker.getPot().put(this.id, poker.getMaximumBetAmount());
     }
 
@@ -38,12 +38,16 @@ public class Player {
         Integer betAmount = poker.getPot().get(this.id);
         poker.setMaximumBetAmount(poker.getMaximumBetAmount() + addCoin);
         this.amount -= (poker.getMaximumBetAmount() - betAmount);
+        poker.addAmountOfPot(poker.getMaximumBetAmount() - betAmount);
         poker.getPot().put(this.id, poker.getMaximumBetAmount());
     }
 
     public void fold() {
-        this.poker = null;
+        this.poker.getPot().remove(this.id);
         this.status = OFFLINE;
+        if (this.poker.getPot().size() == 1) {
+            this.poker.setWinnerId(this.poker.getPot().keySet().stream().findFirst().orElse(null));
+        }
     }
 
     public void check() {

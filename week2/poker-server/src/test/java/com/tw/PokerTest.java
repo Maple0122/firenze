@@ -148,4 +148,28 @@ public class PokerTest {
         assertThat(player.getAmount()).isEqualTo(0);
         assertThat(player.getStatus()).isEqualTo(ONLINE);
     }
+
+    @Test
+    void should_pot_is_90_and_small_blind_win_40_when_only_small_blind_online_given_four_player_and_a_poker() {
+        // Given
+        Poker poker = new Poker(PLAYER_SIZE);
+        Player dealer = new Player(1, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player smallBlind = new Player(2, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player bigBlind = new Player(3, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player player = new Player(4, AMOUNT_FOR_EACH_PLAYER, poker);
+
+        // When
+        smallBlind.bet(10);
+        bigBlind.bet(20);
+        player.call();
+        dealer.fold();
+        smallBlind.bet(40);
+        bigBlind.fold();
+        player.fold();
+
+        // Then
+        assertThat(poker.getAmountOfPot()).isEqualTo(90);
+        assertThat(poker.getWinnerId()).isEqualTo(2);
+        assertThat(poker.getWinAmount()).isEqualTo(40);
+    }
 }

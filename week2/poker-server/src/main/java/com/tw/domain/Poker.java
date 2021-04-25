@@ -12,10 +12,14 @@ import java.util.Map;
 public class Poker {
     private final Map<Integer, Integer> pot = new HashMap<>();
     private Integer maximumBetAmount;
+    private Integer amountOfPot;
+    private Integer winnerId;
+    private Integer winAmount;
 
     public Poker(Integer playerSize) {
         initPoker(playerSize);
         this.maximumBetAmount = 0;
+        this.amountOfPot = 0;
     }
 
     private void initPoker(Integer playerSize) {
@@ -27,7 +31,11 @@ public class Poker {
         }
     }
 
-    public Integer getAmountOfPot() {
-        return this.pot.values().stream().mapToInt(Integer::intValue).sum();
+    public void addAmountOfPot(Integer coin) {
+        this.amountOfPot += coin;
+    }
+
+    public Integer getWinAmount() {
+        return this.getAmountOfPot() - pot.get(winnerId);
     }
 }
