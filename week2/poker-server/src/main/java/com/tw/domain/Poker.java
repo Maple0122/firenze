@@ -1,10 +1,14 @@
 package com.tw.domain;
 
 import com.tw.exception.InvalidParameterException;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
+@Setter
 public class Poker {
     private final Map<Integer, Integer> pot = new HashMap<>();
     private Integer maximumBetAmount;
@@ -23,11 +27,7 @@ public class Poker {
         }
     }
 
-    public Map<Integer, Integer> getPot() {
-        return pot;
-    }
-
-    public Integer getMaximumBetAmount() {
-        return maximumBetAmount;
+    public Integer getAmountOfPot() {
+        return this.pot.values().stream().mapToInt(Integer::intValue).sum();
     }
 }
