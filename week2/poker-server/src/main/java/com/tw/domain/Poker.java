@@ -4,7 +4,9 @@ import com.tw.exception.InvalidParameterException;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -13,8 +15,7 @@ public class Poker {
     private final Map<Integer, Integer> pot = new HashMap<>();
     private Integer maximumBetAmount;
     private Integer amountOfPot;
-    private Integer winnerId;
-    private Integer winAmount;
+    private List<Integer> winnerIds = new ArrayList<>();
 
     public Poker(Integer playerSize) {
         initPoker(playerSize);
@@ -33,9 +34,5 @@ public class Poker {
 
     public void addAmountOfPot(Integer coin) {
         this.amountOfPot += coin;
-    }
-
-    public Integer getWinAmount() {
-        return this.getAmountOfPot() - pot.get(winnerId);
     }
 }

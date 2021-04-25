@@ -4,9 +4,9 @@ import com.tw.domain.Player;
 import static com.tw.domain.PlayerStatus.OFFLINE;
 import static com.tw.domain.PlayerStatus.ONLINE;
 import com.tw.domain.Poker;
-import org.junit.jupiter.api.Test;
-
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 public class PokerTest {
     private static final int AMOUNT_FOR_EACH_PLAYER = 100;
@@ -101,7 +101,7 @@ public class PokerTest {
         player.fold();
 
         // Then
-        assertThat(player.getAmount()).isEqualTo(80);
+        assertThat(player.getRemainAmount()).isEqualTo(80);
         assertThat(player.getStatus()).isEqualTo(OFFLINE);
     }
 
@@ -145,7 +145,7 @@ public class PokerTest {
 
         // Then
         assertThat(poker.getAmountOfPot()).isEqualTo(130);
-        assertThat(player.getAmount()).isEqualTo(0);
+        assertThat(player.getRemainAmount()).isEqualTo(0);
         assertThat(player.getStatus()).isEqualTo(ONLINE);
     }
 
@@ -169,7 +169,33 @@ public class PokerTest {
 
         // Then
         assertThat(poker.getAmountOfPot()).isEqualTo(90);
-        assertThat(poker.getWinnerId()).isEqualTo(2);
-        assertThat(poker.getWinAmount()).isEqualTo(40);
+        assertThat(poker.getWinnerIds().get(0)).isEqualTo(2);
+        assertThat(smallBlind.calculateWinAmount()).isEqualTo(40);
+    }
+
+    @Test
+    void should_pot_is_300_and_player_win_30_and_big_blind_win_70_when_shutdown_given_four_player_and_a_poker() {
+        // Given
+        Poker poker = new Poker(PLAYER_SIZE);
+        Player dealer = new Player(1, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player smallBlind = new Player(2, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player bigBlind = new Player(3, AMOUNT_FOR_EACH_PLAYER, poker);
+        Player player = new Player(4, AMOUNT_FOR_EACH_PLAYER, poker);
+        poker.getWinnerIds().addAll(asList(4, 3));
+
+        // When
+        smallBlind.bet(10);
+        bigBlind.bet(20);
+        player.allIn();
+        dealer.fold();
+        smallBlind.allIn();
+        bigBlind.allIn();
+
+        // Then
+        assertThat(poker.getAmountOfPot()).isEqualTo(300);
+        assertThat(poker.getWinnerIds().get(0)).isEqualTo(4);
+        assertThat(player.calculateWinAmountForAllInPlayer()).isEqualTo(30);
+        assertThat(poker.getWinnerIds().get(1)).isEqualTo(3);
+        assertThat(bigBlind.calculateWinAmountForAllInPlayer() - player.getAmountOfPotBeforeAllIn()).isEqualTo(70);
     }
 }
