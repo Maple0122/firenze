@@ -8,41 +8,41 @@ import lombok.Getter;
 public class Player {
     private final Integer id;
     private final Poker poker;
-    private final Integer initAmount;
-    private Integer remainAmount;
+    private final Integer initCoin;
+    private Integer remainCoin;
     private PlayerStatus status;
-    private Integer amountOfPotBeforeAllIn;
+    private Integer coinOfPotWhenAllIn;
 
-    public Player(Integer id, Integer amount, Poker poker) {
+    public Player(Integer id, Integer coin, Poker poker) {
         this.id = id;
-        this.initAmount = amount;
-        this.remainAmount = amount;
+        this.initCoin = coin;
+        this.remainCoin = coin;
         this.poker = poker;
         this.status = ONLINE;
     }
 
     public void call() {
-        Integer betAmount = poker.getPot().get(this.id);
-        int callAmount = poker.getMaximumBetAmount() - betAmount;
-        this.remainAmount -= callAmount;
-        poker.addAmountOfPot(callAmount);
-        poker.getPot().put(this.id, poker.getMaximumBetAmount());
+        Integer betCoin = poker.getPot().get(this.id);
+        int callCoin = poker.getMaximumBetCoin() - betCoin;
+        this.remainCoin -= callCoin;
+        poker.addPotCoin(callCoin);
+        poker.getPot().put(this.id, poker.getMaximumBetCoin());
     }
 
     public void bet(Integer coin) {
-        this.remainAmount -= coin;
-        Integer betAmount = poker.getPot().get(this.id);
-        poker.setMaximumBetAmount(betAmount + coin);
-        poker.addAmountOfPot(coin);
-        poker.getPot().put(this.id, poker.getMaximumBetAmount());
+        this.remainCoin -= coin;
+        Integer betCoin = poker.getPot().get(this.id);
+        poker.setMaximumBetCoin(betCoin + coin);
+        poker.addPotCoin(coin);
+        poker.getPot().put(this.id, poker.getMaximumBetCoin());
     }
 
     public void raise(Integer addCoin) {
-        Integer betAmount = poker.getPot().get(this.id);
-        poker.setMaximumBetAmount(poker.getMaximumBetAmount() + addCoin);
-        this.remainAmount -= (poker.getMaximumBetAmount() - betAmount);
-        poker.addAmountOfPot(poker.getMaximumBetAmount() - betAmount);
-        poker.getPot().put(this.id, poker.getMaximumBetAmount());
+        Integer betCoin = poker.getPot().get(this.id);
+        poker.setMaximumBetCoin(poker.getMaximumBetCoin() + addCoin);
+        this.remainCoin -= (poker.getMaximumBetCoin() - betCoin);
+        poker.addPotCoin(poker.getMaximumBetCoin() - betCoin);
+        poker.getPot().put(this.id, poker.getMaximumBetCoin());
     }
 
     public void fold() {
@@ -58,15 +58,15 @@ public class Player {
     }
 
     public void allIn() {
-        this.bet(this.remainAmount);
-        this.amountOfPotBeforeAllIn = this.poker.getAmountOfPot();
+        this.bet(this.remainCoin);
+        this.coinOfPotWhenAllIn = this.poker.getPotCoin();
     }
 
     public Integer calculateWinAmount() {
-        return this.poker.getAmountOfPot() - this.poker.getPot().get(this.id);
+        return this.poker.getPotCoin() - this.poker.getPot().get(this.id);
     }
 
     public Integer calculateWinAmountForAllInPlayer() {
-        return this.amountOfPotBeforeAllIn - this.initAmount;
+        return this.coinOfPotWhenAllIn - this.initCoin;
     }
 }

@@ -13,14 +13,14 @@ import java.util.Map;
 @Setter
 public class Poker {
     private final Map<Integer, Integer> pot = new HashMap<>();
-    private Integer maximumBetAmount;
-    private Integer amountOfPot;
+    private Integer maximumBetCoin;
+    private Integer potCoin;
     private List<Integer> winnerIds = new ArrayList<>();
 
     public Poker(Integer playerSize) {
         initPoker(playerSize);
-        this.maximumBetAmount = 0;
-        this.amountOfPot = 0;
+        this.maximumBetCoin = 0;
+        this.potCoin = 0;
     }
 
     private void initPoker(Integer playerSize) {
@@ -32,7 +32,7 @@ public class Poker {
         }
     }
 
-    public void addAmountOfPot(Integer coin) {
-        this.amountOfPot += coin;
+    public void addPotCoin(Integer coin) {
+        this.potCoin += coin;
     }
 }
