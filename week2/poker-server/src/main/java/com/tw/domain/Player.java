@@ -4,69 +4,77 @@ import static com.tw.domain.PlayerStatus.OFFLINE;
 import static com.tw.domain.PlayerStatus.ONLINE;
 import lombok.Getter;
 
+import java.util.Objects;
+
 @Getter
 public class Player {
     private final Integer id;
     private final Poker poker;
-    private final Integer initCoin;
-    private Integer remainCoin;
+    private final Integer initWager;
+    private Integer remainWager;
     private PlayerStatus status;
-    private Integer coinOfPotWhenAllIn;
+    private Integer potWhenAllIn;
 
-    public Player(Integer id, Integer coin, Poker poker) {
+    public Player(Integer id, Integer initWager, Poker poker) {
         this.id = id;
-        this.initCoin = coin;
-        this.remainCoin = coin;
+        this.initWager = initWager;
+        this.remainWager = initWager;
         this.poker = poker;
         this.status = ONLINE;
     }
 
     public void call() {
-        Integer betCoin = poker.getPot().get(this.id);
-        int callCoin = poker.getMaximumBetCoin() - betCoin;
-        this.remainCoin -= callCoin;
-        poker.addPotCoin(callCoin);
-        poker.getPot().put(this.id, poker.getMaximumBetCoin());
+        Integer bid = poker.getRoundWager().get(id);
+        int wager = poker.getCurrentBid() - bid;
+        remainWager -= wager;
+        poker.setPot(poker.getPot() + wager);
+        poker.getRoundWager().put(id, poker.getCurrentBid());
+        poker.nextRound();
     }
 
-    public void bet(Integer coin) {
-        this.remainCoin -= coin;
-        Integer betCoin = poker.getPot().get(this.id);
-        poker.setMaximumBetCoin(betCoin + coin);
-        poker.addPotCoin(coin);
-        poker.getPot().put(this.id, poker.getMaximumBetCoin());
+    public void bet() {
+        remainWager -= poker.getCurrentBid();
+        poker.setPot(poker.getPot() + poker.getCurrentBid());
+        poker.getRoundWager().put(id, poker.getCurrentBid());
+        poker.nextRound();
     }
 
-    public void raise(Integer addCoin) {
-        Integer betCoin = poker.getPot().get(this.id);
-        poker.setMaximumBetCoin(poker.getMaximumBetCoin() + addCoin);
-        this.remainCoin -= (poker.getMaximumBetCoin() - betCoin);
-        poker.addPotCoin(poker.getMaximumBetCoin() - betCoin);
-        poker.getPot().put(this.id, poker.getMaximumBetCoin());
+    public void raise(Integer wager) {
+        poker.setCurrentBid(wager);
+        remainWager -= wager;
+        poker.setPot(poker.getPot() + wager);
+        poker.getRoundWager().put(id, poker.getCurrentBid());
+        poker.nextRound();
     }
 
     public void fold() {
-        this.poker.getPot().remove(this.id);
-        this.status = OFFLINE;
-        if (this.poker.getPot().size() == 1) {
-            this.poker.getWinnerIds().add(this.poker.getPot().keySet().stream().findFirst().orElse(null));
+        poker.getRoundWager().remove(id);
+        status = OFFLINE;
+        if (poker.getRoundWager().size() == 1) {
+            poker.getWinnerIds().add(poker.getRoundWager().keySet().stream().findFirst().orElse(null));
         }
+        poker.nextRound();
     }
 
     public void check() {
-        this.bet(0);
+        poker.setCurrentBid(0);
+        poker.getRoundWager().put(id, poker.getCurrentBid());
+        poker.nextRound();
     }
 
     public void allIn() {
-        this.bet(this.remainCoin);
-        this.coinOfPotWhenAllIn = this.poker.getPotCoin();
+        poker.setCurrentBid(remainWager);
+        poker.setPot(poker.getPot() + remainWager);
+        remainWager = 0;
+        potWhenAllIn = poker.getPot();
+        poker.getRoundWager().put(id, poker.getCurrentBid());
+        poker.nextRound();
     }
 
-    public Integer calculateWinCoin() {
-        return this.poker.getPotCoin() - this.poker.getPot().get(this.id);
-    }
-
-    public Integer calculateWinCoinOfAllInPlayer() {
-        return this.coinOfPotWhenAllIn - this.initCoin;
+    public Integer getBonus() {
+        if (!Objects.equals(potWhenAllIn, null)) {
+            return potWhenAllIn;
+        }
+        return poker.getPot();
     }
 }

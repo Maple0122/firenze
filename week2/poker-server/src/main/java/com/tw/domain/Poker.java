@@ -12,15 +12,19 @@ import java.util.Map;
 @Getter
 @Setter
 public class Poker {
-    private final Map<Integer, Integer> pot = new HashMap<>();
-    private Integer maximumBetCoin;
-    private Integer potCoin;
+    private final Map<Integer, Integer> roundWager = new HashMap<>();
+    private Integer currentBid;
+    private Integer minWager;
+    private Integer pot;
+    private Round round;
     private List<Integer> winnerIds = new ArrayList<>();
 
-    public Poker(Integer playerSize) {
+    public Poker(Integer playerSize, Integer minWager) {
         initPoker(playerSize);
-        this.maximumBetCoin = 0;
-        this.potCoin = 0;
+        this.minWager = minWager;
+        this.currentBid = this.minWager;
+        this.pot = 0;
+        this.round = Round.PREFLOP;
     }
 
     private void initPoker(Integer playerSize) {
@@ -28,11 +32,13 @@ public class Poker {
             throw new InvalidParameterException("Number of participants is invalid, limit 2 to 10");
         }
         for (int id = 1; id <= playerSize; id++) {
-            this.pot.put(id, 0);
+            this.roundWager.put(id, 0);
         }
     }
 
-    public void addPotCoin(Integer coin) {
-        this.potCoin += coin;
+    public void nextRound() {
+        if (roundWager.values().stream().allMatch(v -> v.equals(currentBid))) {
+            round = Round.values()[round.ordinal() + 1];
+        }
     }
 }

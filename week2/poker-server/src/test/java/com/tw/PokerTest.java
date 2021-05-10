@@ -4,196 +4,115 @@ import com.tw.domain.Player;
 import static com.tw.domain.PlayerStatus.OFFLINE;
 import static com.tw.domain.PlayerStatus.ONLINE;
 import com.tw.domain.Poker;
-import static java.util.Arrays.asList;
+import com.tw.domain.Round;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class PokerTest {
-    private static final int COIN_FOR_EACH_PLAYER = 100;
+    private static final int INIT_WAGER = 100;
+    private static final int MIN_WAGER = 1;
     private static final int PLAYER_SIZE = 4;
+    private static final int DEALER_ID = 1;
+    public static final int SMALL_BLIND_ID = 2;
+    public static final int BIG_BLIND_ID = 3;
+    public static final int PLAYER_ID = 4;
+    private Poker poker;
+    private Player dealer;
+    private Player smallBlind;
+    private Player bigBlind;
+    private Player player;
 
-    @Test
-    void should_pot_is_30_when_bet_given_two_player_and_a_poker() {
-        // Given
-        Poker poker = new Poker(PLAYER_SIZE);
-        Player smallBlind = new Player(2, COIN_FOR_EACH_PLAYER, poker);
-        Player bigBlind = new Player(3, COIN_FOR_EACH_PLAYER, poker);
-
-        // When
-        smallBlind.bet(10);
-        smallBlind.bet(20);
-
-        // Then
-        assertThat(poker.getPotCoin()).isEqualTo(30);
+    @BeforeEach
+    public void blind() {
+        poker = new Poker(PLAYER_SIZE, MIN_WAGER);
+        dealer = new Player(DEALER_ID, INIT_WAGER, poker);
+        smallBlind = new Player(SMALL_BLIND_ID, INIT_WAGER, poker);
+        bigBlind = new Player(BIG_BLIND_ID, INIT_WAGER, poker);
+        player = new Player(PLAYER_ID, INIT_WAGER, poker);
     }
 
     @Test
-    void should_pot_is_50_when_player_call_given_three_player_and_a_poker() {
-        // Given
-        Poker poker = new Poker(PLAYER_SIZE);
-        Player smallBlind = new Player(2, COIN_FOR_EACH_PLAYER, poker);
-        Player bigBlind = new Player(3, COIN_FOR_EACH_PLAYER, poker);
-        Player player = new Player(4, COIN_FOR_EACH_PLAYER, poker);
-
-        // When
-        smallBlind.bet(10);
-        bigBlind.bet(20);
-        player.call();
-
-        // Then
-        assertThat(poker.getPotCoin()).isEqualTo(50);
+    void should_is_1_when_bet_given_a_poker() {
+        assertThat(poker.getPot()).isEqualTo(0);
+        player.bet();
+        assertThat(poker.getPot()).isEqualTo(1);
     }
 
     @Test
-    void should_pot_is_70_when_raise_given_three_player_and_a_poker() {
-        // Given
-        Poker poker = new Poker(PLAYER_SIZE);
-        Player smallBlind = new Player(2, COIN_FOR_EACH_PLAYER, poker);
-        Player bigBlind = new Player(3, COIN_FOR_EACH_PLAYER, poker);
-        Player player = new Player(4, COIN_FOR_EACH_PLAYER, poker);
-
-        // When
-        smallBlind.bet(10);
-        bigBlind.bet(20);
-        player.raise(20);
-
-        // Then
-        assertThat(poker.getPotCoin()).isEqualTo(70);
+    void should_is_3_when_raise_given_a_poker() {
+        assertThat(poker.getPot()).isEqualTo(0);
+        smallBlind.bet();
+        assertThat(poker.getPot()).isEqualTo(1);
+        bigBlind.raise(2);
+        assertThat(poker.getPot()).isEqualTo(3);
     }
 
     @Test
-    void should_pot_is_80_when_raise_given_four_player_and_a_poker() {
-        // Given
-        Poker poker = new Poker(PLAYER_SIZE);
-        Player dealer = new Player(1, COIN_FOR_EACH_PLAYER, poker);
-        Player smallBlind = new Player(2, COIN_FOR_EACH_PLAYER, poker);
-        Player bigBlind = new Player(3, COIN_FOR_EACH_PLAYER, poker);
-        Player player = new Player(4, COIN_FOR_EACH_PLAYER, poker);
-
-        // When
-        smallBlind.bet(5);
-        bigBlind.bet(10);
-        player.raise(10);
-        dealer.call();
+    void should_enter_next_round_when_raise_given_a_poker() {
+        assertThat(poker.getRound()).isEqualTo(Round.PREFLOP);
+        smallBlind.bet();
+        bigBlind.raise(2);
+        player.bet();
+        dealer.bet();
         smallBlind.call();
-        bigBlind.call();
-
-        // Then
-        assertThat(poker.getPotCoin()).isEqualTo(80);
+        assertThat(poker.getPot()).isEqualTo(8);
+        assertThat(poker.getRound()).isEqualTo(Round.FLOP);
     }
 
     @Test
-    void should_player_coin_is_80_and_offline_when_fold_given_four_player_and_a_poker() {
-        // Given
-        Poker poker = new Poker(PLAYER_SIZE);
-        Player dealer = new Player(1, COIN_FOR_EACH_PLAYER, poker);
-        Player smallBlind = new Player(2, COIN_FOR_EACH_PLAYER, poker);
-        Player bigBlind = new Player(3, COIN_FOR_EACH_PLAYER, poker);
-        Player player = new Player(4, COIN_FOR_EACH_PLAYER, poker);
-
-        // When
-        smallBlind.bet(10);
-        bigBlind.bet(20);
-        player.call();
-        dealer.call();
-        smallBlind.call();
-        bigBlind.call();
+    void should_is_80_when_fold_given_a_poker() {
+        smallBlind.bet();
+        bigBlind.raise(2);
         player.fold();
-
-        // Then
-        assertThat(player.getRemainCoin()).isEqualTo(80);
+        assertThat(player.getRemainWager()).isEqualTo(INIT_WAGER);
         assertThat(player.getStatus()).isEqualTo(OFFLINE);
     }
 
     @Test
-    void should_pot_is_110_when_first_player_check_on_flop_given_four_player_and_a_poker() {
-        // Given
-        Poker poker = new Poker(PLAYER_SIZE);
-        Player dealer = new Player(1, COIN_FOR_EACH_PLAYER, poker);
-        Player smallBlind = new Player(2, COIN_FOR_EACH_PLAYER, poker);
-        Player bigBlind = new Player(3, COIN_FOR_EACH_PLAYER, poker);
-        Player player = new Player(4, COIN_FOR_EACH_PLAYER, poker);
-
-        // When
-        smallBlind.bet(10);
-        bigBlind.bet(20);
-        player.call();
-        dealer.call();
-        smallBlind.check();
+    void should_is_8_when_check_given_a_poker() {
+        smallBlind.bet();
+        bigBlind.raise(2);
+        player.bet();
+        dealer.bet();
+        smallBlind.call();
+        assertThat(poker.getRound()).isEqualTo(Round.FLOP);
         bigBlind.check();
-        player.bet(20);
-        dealer.call();
-
-        // Then
-        assertThat(poker.getPotCoin()).isEqualTo(110);
+        assertThat(poker.getPot()).isEqualTo(8);
+        assertThat(poker.getCurrentBid()).isEqualTo(0);
     }
 
     @Test
-    void should_pot_is_130_and_player_coin_is_0_and_online_when_player_all_in_given_four_player_and_a_poker() {
-        // Given
-        Poker poker = new Poker(PLAYER_SIZE);
-        Player dealer = new Player(1, COIN_FOR_EACH_PLAYER, poker);
-        Player smallBlind = new Player(2, COIN_FOR_EACH_PLAYER, poker);
-        Player bigBlind = new Player(3, COIN_FOR_EACH_PLAYER, poker);
-        Player player = new Player(4, COIN_FOR_EACH_PLAYER, poker);
-
-        // When
-        smallBlind.bet(10);
-        bigBlind.bet(20);
+    void should_is_103_when_all_in_given_a_poker() {
+        smallBlind.bet();
+        bigBlind.raise(2);
         player.allIn();
-        dealer.fold();
-
-        // Then
-        assertThat(poker.getPotCoin()).isEqualTo(130);
-        assertThat(player.getRemainCoin()).isEqualTo(0);
+        assertThat(poker.getPot()).isEqualTo(103);
+        assertThat(poker.getCurrentBid()).isEqualTo(100);
+        assertThat(player.getRemainWager()).isEqualTo(0);
         assertThat(player.getStatus()).isEqualTo(ONLINE);
     }
 
     @Test
-    void should_pot_is_90_and_small_blind_win_40_when_only_small_blind_online_given_four_player_and_a_poker() {
-        // Given
-        Poker poker = new Poker(PLAYER_SIZE);
-        Player dealer = new Player(1, COIN_FOR_EACH_PLAYER, poker);
-        Player smallBlind = new Player(2, COIN_FOR_EACH_PLAYER, poker);
-        Player bigBlind = new Player(3, COIN_FOR_EACH_PLAYER, poker);
-        Player player = new Player(4, COIN_FOR_EACH_PLAYER, poker);
-
-        // When
-        smallBlind.bet(10);
-        bigBlind.bet(20);
-        player.call();
-        dealer.fold();
-        smallBlind.bet(40);
-        bigBlind.fold();
+    void should_is_90_when_one_player_online_given_a_poker() {
+        smallBlind.bet();
+        bigBlind.raise(2);
         player.fold();
-
-        // Then
-        assertThat(poker.getPotCoin()).isEqualTo(90);
-        assertThat(poker.getWinnerIds().get(0)).isEqualTo(2);
-        assertThat(smallBlind.calculateWinCoin()).isEqualTo(40);
+        dealer.fold();
+        smallBlind.fold();
+        assertThat(poker.getPot()).isEqualTo(3);
+        assertThat(poker.getWinnerIds().get(0)).isEqualTo(BIG_BLIND_ID);
+        assertThat(bigBlind.getBonus()).isEqualTo(3);
     }
 
     @Test
-    void should_pot_is_300_and_player_win_30_and_big_blind_win_70_when_shutdown_given_four_player_and_a_poker() {
-        // Given
-        Poker poker = new Poker(PLAYER_SIZE);
-        Player dealer = new Player(1, COIN_FOR_EACH_PLAYER, poker);
-        Player smallBlind = new Player(2, COIN_FOR_EACH_PLAYER, poker);
-        Player bigBlind = new Player(3, COIN_FOR_EACH_PLAYER, poker);
-        Player player = new Player(4, COIN_FOR_EACH_PLAYER, poker);
-        poker.getWinnerIds().addAll(asList(4, 3));
-
-        // When
-        smallBlind.bet(10);
-        bigBlind.bet(20);
+    void should_is_300_when_shutdown_given_a_poker() {
+        smallBlind.bet();
+        bigBlind.raise(2);
         player.allIn();
         dealer.fold();
         smallBlind.allIn();
         bigBlind.allIn();
-
-        // Then
-        assertThat(poker.getPotCoin()).isEqualTo(300);
-        assertThat(player.calculateWinCoinOfAllInPlayer()).isEqualTo(30);
-        assertThat(bigBlind.calculateWinCoinOfAllInPlayer() - player.getCoinOfPotWhenAllIn()).isEqualTo(70);
+        assertThat(poker.getPot()).isEqualTo(300);
     }
 }
