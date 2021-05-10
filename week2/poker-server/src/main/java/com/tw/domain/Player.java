@@ -24,51 +24,64 @@ public class Player {
     }
 
     public void call() {
-        Integer bid = poker.getRoundWager().get(id);
-        int wager = poker.getCurrentBid() - bid;
-        remainWager -= wager;
+        Integer wager = poker.getCurrentBid() - poker.getRoundWager().get(id);
+
+
         poker.setPot(poker.getPot() + wager);
+        remainWager -= wager;
         poker.getRoundWager().put(id, poker.getCurrentBid());
         poker.nextRound();
     }
 
     public void bet() {
-        remainWager -= poker.getCurrentBid();
-        poker.setPot(poker.getPot() + poker.getCurrentBid());
+        Integer wager = poker.getCurrentBid();
+
+
+        poker.setPot(poker.getPot() + wager);
+        remainWager -= wager;
         poker.getRoundWager().put(id, poker.getCurrentBid());
         poker.nextRound();
     }
 
     public void raise(Integer wager) {
         poker.setCurrentBid(wager);
-        remainWager -= wager;
-        poker.setPot(poker.getPot() + wager);
-        poker.getRoundWager().put(id, poker.getCurrentBid());
-        poker.nextRound();
-    }
 
-    public void fold() {
-        poker.getRoundWager().remove(id);
-        status = OFFLINE;
-        if (poker.getRoundWager().size() == 1) {
-            poker.getWinnerIds().add(poker.getRoundWager().keySet().stream().findFirst().orElse(null));
-        }
+
+        poker.setPot(poker.getPot() + wager);
+        remainWager -= wager;
+        poker.getRoundWager().put(id, poker.getCurrentBid());
         poker.nextRound();
     }
 
     public void check() {
         poker.setCurrentBid(0);
+
+
+        poker.setPot(poker.getPot() + (Integer) 0);
+        remainWager -= 0;
         poker.getRoundWager().put(id, poker.getCurrentBid());
         poker.nextRound();
     }
 
     public void allIn() {
-        poker.setCurrentBid(remainWager);
-        poker.setPot(poker.getPot() + remainWager);
-        remainWager = 0;
         potWhenAllIn = poker.getPot();
+        poker.setCurrentBid(remainWager);
+
+
+        poker.setPot(poker.getPot() + remainWager);
+        remainWager -= remainWager;
         poker.getRoundWager().put(id, poker.getCurrentBid());
         poker.nextRound();
+    }
+
+    public void fold() {
+        status = OFFLINE;
+        poker.nextRound();
+
+        poker.getRoundWager().remove(id);
+        if (poker.getRoundWager().size() == 1) {
+            poker.getWinnerIds().add(poker.getRoundWager().keySet().stream().findFirst().orElse(null));
+        }
     }
 
     public Integer getBonus() {
