@@ -1,11 +1,12 @@
 package com.tw;
 
-import com.tw.domain.Player;
+import com.tw.domain.*;
+
 import static com.tw.domain.PlayerStatus.OFFLINE;
 import static com.tw.domain.PlayerStatus.ONLINE;
-import com.tw.domain.Poker;
-import com.tw.domain.Round;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.tw.domain.Poker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,58 +36,58 @@ public class PokerTest {
     @Test
     void should_is_1_when_bet_given_a_poker() {
         assertThat(poker.getPot()).isEqualTo(0);
-        player.bet();
+        player.execute(new Bet());
         assertThat(poker.getPot()).isEqualTo(1);
     }
 
     @Test
     void should_is_3_when_raise_given_a_poker() {
         assertThat(poker.getPot()).isEqualTo(0);
-        smallBlind.bet();
+        smallBlind.execute(new Bet());
         assertThat(poker.getPot()).isEqualTo(1);
-        bigBlind.raise(2);
+        bigBlind.execute(new Raise(2));
         assertThat(poker.getPot()).isEqualTo(3);
     }
 
     @Test
     void should_enter_next_round_when_raise_given_a_poker() {
         assertThat(poker.getRound()).isEqualTo(Round.PREFLOP);
-        smallBlind.bet();
-        bigBlind.raise(2);
-        player.bet();
-        dealer.bet();
-        smallBlind.call();
+        smallBlind.execute(new Bet());
+        bigBlind.execute(new Raise(2));
+        player.execute(new Bet());
+        dealer.execute(new Bet());
+        smallBlind.execute(new Call());
         assertThat(poker.getPot()).isEqualTo(8);
         assertThat(poker.getRound()).isEqualTo(Round.FLOP);
     }
 
     @Test
     void should_is_80_when_fold_given_a_poker() {
-        smallBlind.bet();
-        bigBlind.raise(2);
-        player.fold();
+        smallBlind.execute(new Bet());
+        bigBlind.execute(new Raise(2));
+        player.execute(new Fold());
         assertThat(player.getRemainWager()).isEqualTo(INIT_WAGER);
         assertThat(player.getStatus()).isEqualTo(OFFLINE);
     }
 
     @Test
     void should_is_8_when_check_given_a_poker() {
-        smallBlind.bet();
-        bigBlind.raise(2);
-        player.bet();
-        dealer.bet();
-        smallBlind.call();
+        smallBlind.execute(new Bet());
+        bigBlind.execute(new Raise(2));
+        player.execute(new Bet());
+        dealer.execute(new Bet());
+        smallBlind.execute(new Call());
         assertThat(poker.getRound()).isEqualTo(Round.FLOP);
-        bigBlind.check();
+        bigBlind.execute(new Check());
         assertThat(poker.getPot()).isEqualTo(8);
         assertThat(poker.getCurrentBid()).isEqualTo(0);
     }
 
     @Test
     void should_is_103_when_all_in_given_a_poker() {
-        smallBlind.bet();
-        bigBlind.raise(2);
-        player.allIn();
+        smallBlind.execute(new Bet());
+        bigBlind.execute(new Raise(2));
+        player.execute(new AllIn());
         assertThat(poker.getPot()).isEqualTo(103);
         assertThat(poker.getCurrentBid()).isEqualTo(100);
         assertThat(player.getRemainWager()).isEqualTo(0);
@@ -95,11 +96,11 @@ public class PokerTest {
 
     @Test
     void should_is_90_when_one_player_online_given_a_poker() {
-        smallBlind.bet();
-        bigBlind.raise(2);
-        player.fold();
-        dealer.fold();
-        smallBlind.fold();
+        smallBlind.execute(new Bet());
+        bigBlind.execute(new Raise(2));
+        player.execute(new Fold());
+        dealer.execute(new Fold());
+        smallBlind.execute(new Fold());
         assertThat(poker.getPot()).isEqualTo(3);
         assertThat(poker.getWinnerIds().get(0)).isEqualTo(BIG_BLIND_ID);
         assertThat(bigBlind.getBonus()).isEqualTo(3);
@@ -107,12 +108,12 @@ public class PokerTest {
 
     @Test
     void should_is_300_when_shutdown_given_a_poker() {
-        smallBlind.bet();
-        bigBlind.raise(2);
-        player.allIn();
-        dealer.fold();
-        smallBlind.allIn();
-        bigBlind.allIn();
+        smallBlind.execute(new Bet());
+        bigBlind.execute(new Raise(2));
+        player.execute(new AllIn());
+        dealer.execute(new Fold());
+        smallBlind.execute(new AllIn());
+        bigBlind.execute(new AllIn());
         assertThat(poker.getPot()).isEqualTo(300);
     }
 }

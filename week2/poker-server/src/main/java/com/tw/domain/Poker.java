@@ -37,7 +37,7 @@ public class Poker {
     }
 
     public void nextRound() {
-        if (roundWager.values().stream().allMatch(v -> v.equals(currentBid))) {
+        if (roundWager.values().stream().allMatch(wager -> wager.equals(currentBid))) {
             round = Round.values()[round.ordinal() + 1];
         }
     }
