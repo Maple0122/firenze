@@ -45,4 +45,11 @@ public class Game {
     public Integer getBonus(Player player) {
         return Objects.equals(player.getPotWhenAllIn(), null) ? pot : player.getPotWhenAllIn();
     }
+
+    public void gameIsOver() {
+        if (getRoundWager().size() == 1) {
+            Integer winnerId = getRoundWager().keySet().stream().findFirst().orElse(null);
+            getWinnerIds().add(winnerId);
+        }
+    }
 }

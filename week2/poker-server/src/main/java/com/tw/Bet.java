@@ -2,7 +2,7 @@ package com.tw;
 
 public class Bet implements Action {
     @Override
-    public Integer getBid(Player player) {
+    public Integer execute(Player player) {
         Game game = player.getGame();
         if (game.getCurrentBid() < game.getMinWager()) {
             game.setCurrentBid(game.getMinWager());

@@ -1,5 +1,5 @@
 package com.tw;
 
 public interface Action {
-    Integer getBid(Player player);
+    Integer execute(Player player);
 }

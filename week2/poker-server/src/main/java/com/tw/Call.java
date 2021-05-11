@@ -2,7 +2,7 @@ package com.tw;
 
 public class Call implements Action {
     @Override
-    public Integer getBid(Player player) {
+    public Integer execute(Player player) {
         Game game = player.getGame();
         Integer currentBid = game.getCurrentBid();
         Integer bid = game.getRoundWager().get(player.getId());

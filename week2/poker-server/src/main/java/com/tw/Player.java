@@ -1,11 +1,8 @@
 package com.tw;
 
+import static com.tw.Status.ACTIVE;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Objects;
-
-import static com.tw.Status.ACTIVE;
 
 @Getter
 @Setter
@@ -26,7 +23,7 @@ public class Player {
     }
 
     public void execute(Action action) {
-        Integer bid = action.getBid(this);
+        Integer bid = action.execute(this);
         remainWager -= bid;
         game.setPot(game.getPot() + bid);
         game.nextRound();
