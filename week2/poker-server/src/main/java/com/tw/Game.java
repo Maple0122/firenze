@@ -20,25 +20,28 @@ public class Game {
     private List<Integer> winnerIds = new ArrayList<>();
 
     public Game(Integer playerSize, Integer minWager) {
-        initPoker(playerSize);
+        initGame(playerSize);
         this.minWager = minWager;
         this.currentBid = minWager;
         this.pot = 0;
         this.round = Round.PREFLOP;
     }
 
-    private void initPoker(Integer playerSize) {
+    private void initGame(Integer playerSize) {
         if (playerSize < 2 || playerSize > 10) {
             throw new RuntimeException("Number of participants is invalid, limit 2 to 10");
         }
         for (int id = 1; id <= playerSize; id++) {
-            this.roundWager.put(id, 0);
+            this.roundWager.put(id, null);
         }
     }
 
     public void nextRound() {
         if (roundWager.values().stream().allMatch(wager -> currentBid.equals(wager))) {
             round = Round.values()[round.ordinal() + 1];
+            roundWager.keySet().forEach(id -> roundWager.put(id, null));
+            setMinWager(getCurrentBid());
+            setCurrentBid(0);
         }
     }
 

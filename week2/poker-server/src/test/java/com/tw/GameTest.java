@@ -1,6 +1,5 @@
 package com.tw;
 
-import static com.tw.Status.ACTIVE;
 import static com.tw.Status.INACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +43,18 @@ public class GameTest {
     }
 
     @Test
+    void should_enter_next_round_when_bet_same_wager_given_min_wager() {
+        assertThat(game.getRound()).isEqualTo(Round.PREFLOP);
+        a.execute(new Bet());
+        b.execute(new Bet());
+        c.execute(new Bet());
+        assertThat(game.getRound()).isEqualTo(Round.FLOP);
+        assertThat(game.getPot()).isEqualTo(3);
+        a.execute(new Bet());
+        assertThat(game.getRound()).isEqualTo(Round.FLOP);
+    }
+
+    @Test
     void should_enter_next_round_when_player_b_raise_given_min_wager() {
         assertThat(game.getRound()).isEqualTo(Round.PREFLOP);
         a.execute(new Bet());
@@ -54,17 +65,7 @@ public class GameTest {
         a.execute(new Call());
         assertThat(game.getPot()).isEqualTo(6);
         assertThat(game.getRound()).isEqualTo(Round.FLOP);
-        assertThat(game.getCurrentBid()).isEqualTo(2);
-    }
-
-    @Test
-    void should_enter_next_round_when_bet_same_wager_given_min_wager() {
-        assertThat(game.getRound()).isEqualTo(Round.PREFLOP);
-        a.execute(new Bet());
-        b.execute(new Bet());
-        c.execute(new Bet());
-        assertThat(game.getRound()).isEqualTo(Round.FLOP);
-        assertThat(game.getPot()).isEqualTo(3);
+        assertThat(game.getCurrentBid()).isEqualTo(0);
     }
 
     @Test
@@ -86,7 +87,6 @@ public class GameTest {
         b.execute(new Check());
         c.execute(new Check());
         assertThat(game.getPot()).isEqualTo(3);
-        assertThat(game.getCurrentBid()).isEqualTo(0);
         assertThat(game.getRound()).isEqualTo(Round.TURN);
     }
 
