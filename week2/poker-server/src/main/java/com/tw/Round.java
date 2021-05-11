@@ -1,4 +1,4 @@
-package com.tw.domain;
+package com.tw;
 
 public enum Round {
     PREFLOP,
