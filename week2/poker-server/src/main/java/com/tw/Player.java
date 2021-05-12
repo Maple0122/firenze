@@ -1,6 +1,7 @@
 package com.tw;
 
 import static com.tw.Status.ACTIVE;
+import com.tw.action.Action;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,8 +25,13 @@ public class Player {
 
     public void execute(Action action) {
         Integer bid = action.execute(this);
-        remainWager -= bid;
-        game.setPot(game.getPot() + bid);
+        wage(bid);
+        game.putInPot(bid);
+        game.deal();
         game.nextRound();
+    }
+
+    private void wage(Integer bid) {
+        remainWager -= bid;
     }
 }

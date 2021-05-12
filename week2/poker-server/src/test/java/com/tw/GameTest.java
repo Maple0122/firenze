@@ -1,9 +1,21 @@
 package com.tw;
 
 import static com.tw.Status.INACTIVE;
+import com.tw.action.AllIn;
+import com.tw.action.Bet;
+import com.tw.action.Call;
+import com.tw.action.Check;
+import com.tw.action.Fold;
+import com.tw.action.Raise;
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GameTest {
     private static final int INIT_WAGER = 100;
@@ -20,7 +32,7 @@ public class GameTest {
     @BeforeEach
     public void setup() {
         game = new Game(PLAYER_SIZE, MIN_WAGER);
-        a = new Player(A_ID, INIT_WAGER, game);
+        a = new Player(A_ID, 10, game);
         b = new Player(B_ID, INIT_WAGER, game);
         c = new Player(C_ID, INIT_WAGER, game);
     }
@@ -91,15 +103,15 @@ public class GameTest {
     }
 
     @Test
-    void should_is_100_when_player_a_all_in_given_min_wager() {
+    void should_is_10_when_player_a_all_in_given_min_wager() {
         assertThat(game.getPot()).isEqualTo(0);
         a.execute(new AllIn());
-        assertThat(game.getPot()).isEqualTo(100);
-        assertThat(game.getCurrentBid()).isEqualTo(100);
+        assertThat(game.getPot()).isEqualTo(10);
+        assertThat(game.getCurrentBid()).isEqualTo(10);
     }
 
     @Test
-    void should_get_bonus_3_when_player_a_and_b_both_fold_given_min_wager() {
+    void should_checkout_3_when_player_a_and_b_both_fold_given_min_wager() {
         a.execute(new Bet());
         b.execute(new Bet());
         c.execute(new Bet());
@@ -109,6 +121,84 @@ public class GameTest {
         b.execute(new Fold());
         assertThat(game.getPot()).isEqualTo(3);
         assertThat(game.getWinnerIds().get(0)).isEqualTo(C_ID);
-        assertThat(game.getBonus(c)).isEqualTo(3);
+        assertThat(game.checkout(c)).isEqualTo(3);
+    }
+
+    @Test
+    void should_checkout_12_when_player_a_b_and_c_both_bet_given_min_wager() {
+        Map<Integer, List<Poker>> selectedPoker = new HashMap<>();
+        selectedPoker.put(A_ID, asList(new Poker("黑桃", "8"),
+                new Poker("红桃", "8"),
+                new Poker("方块", "8"),
+                new Poker("梅花", "J"),
+                new Poker("黑桃", "4")));
+        selectedPoker.put(B_ID, asList(new Poker("红桃", "A"),
+                new Poker("红桃", "K"),
+                new Poker("红桃", "Q"),
+                new Poker("红桃", "J"),
+                new Poker("红桃", "10")));
+        selectedPoker.put(C_ID, asList(new Poker("红桃", "6"),
+                new Poker("黑桃", "6"),
+                new Poker("方块", "6"),
+                new Poker("梅花", "6"),
+                new Poker("黑桃", "10")));
+        a.execute(new Bet());
+        b.execute(new Bet());
+        c.execute(new Bet());
+        a.execute(new Bet());
+        b.execute(new Bet());
+        c.execute(new Bet());
+        a.execute(new Bet());
+        b.execute(new Bet());
+        c.execute(new Bet());
+        assertThat(game.getRound()).isEqualTo(Round.RIVER);
+        assertThat(game.getPot()).isEqualTo(9);
+        a.execute(new Bet());
+        b.execute(new Bet());
+        c.execute(new Bet());
+        game.shutDown(selectedPoker);
+        assertThat(game.getPot()).isEqualTo(12);
+        assertThat(game.getWinnerIds().get(0)).isEqualTo(B_ID);
+        assertThat(game.checkout(b)).isEqualTo(12);
+    }
+
+    @Test
+    void should_checkout_6_when_player_a_b_and_c_both_bet_given_min_wager() {
+        Map<Integer, List<Poker>> selectedPoker = new HashMap<>();
+        selectedPoker.put(A_ID, asList(new Poker("黑桃", "8"),
+                new Poker("红桃", "8"),
+                new Poker("方块", "8"),
+                new Poker("梅花", "J"),
+                new Poker("黑桃", "4")));
+        selectedPoker.put(B_ID, asList(new Poker("黑桃", "A"),
+                new Poker("黑桃", "K"),
+                new Poker("黑桃", "Q"),
+                new Poker("黑桃", "J"),
+                new Poker("黑桃", "10")));
+        selectedPoker.put(C_ID, asList(new Poker("红桃", "A"),
+                new Poker("红桃", "K"),
+                new Poker("红桃", "Q"),
+                new Poker("红桃", "J"),
+                new Poker("红桃", "10")));
+        a.execute(new Bet());
+        b.execute(new Bet());
+        c.execute(new Bet());
+        a.execute(new Bet());
+        b.execute(new Bet());
+        c.execute(new Bet());
+        a.execute(new Bet());
+        b.execute(new Bet());
+        c.execute(new Bet());
+        assertThat(game.getRound()).isEqualTo(Round.RIVER);
+        assertThat(game.getPot()).isEqualTo(9);
+        a.execute(new Bet());
+        b.execute(new Bet());
+        c.execute(new Bet());
+        game.shutDown(selectedPoker);
+        assertThat(game.getPot()).isEqualTo(12);
+        assertThat(game.getWinnerIds().get(0)).isEqualTo(B_ID);
+        assertThat(game.getWinnerIds().get(1)).isEqualTo(C_ID);
+        assertThat(game.checkout(b)).isEqualTo(6);
+        assertThat(game.checkout(c)).isEqualTo(6);
     }
 }

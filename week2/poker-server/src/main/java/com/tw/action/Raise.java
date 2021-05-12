@@ -1,5 +1,8 @@
-package com.tw;
+package com.tw.action;
 
+import com.tw.Game;
+import com.tw.Player;
+import com.tw.action.Action;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

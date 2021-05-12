@@ -127,5 +127,33 @@ graph TB
     end
 ```
 
+`River`轮次，底池金额为9，玩家A下注，玩家B下注，玩家C下注，发出一张公共牌，玩家A选择牌面为【A,A,A,Q,J】，玩家B为【A,K,Q,J,10】，玩家C为【3,3,3,3,9】，此时玩家B获取胜利，赢取金额为12
 
+```mermaid
+graph TB
+    subgraph ide1[pot]
+    9 -- bet --> 10 -- bet --> 11
+    end
+    subgraph ide2[winner]
+    - --> ide22[-] --> B
+    end
+    subgraph ide3[bonus]
+    0 --> ide32[0] --> ide33[12]
+    end
+```
+
+`River`轮次，底池金额为9，玩家A下注，玩家B下注，玩家C下注，发出一张公共牌，玩家A选择牌面为【A,A,Q,Q,J】，玩家B为【A,K,Q,J,10】，玩家C为【A,K,Q,J,10】，此时玩家B,C获取胜利，各赢取金额为6
+
+```mermaid
+graph TB
+    subgraph ide1[pot]
+    9 -- bet --> 10 -- bet --> 11
+    end
+    subgraph ide2[winner]
+    - --> ide22[-] --> B
+    end
+    subgraph ide3[bonus]
+    0 --> ide32[0] --> ide33[12]
+    end
+```
 

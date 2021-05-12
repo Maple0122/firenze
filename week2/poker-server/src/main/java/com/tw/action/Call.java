@@ -1,4 +1,7 @@
-package com.tw;
+package com.tw.action;
+
+import com.tw.Game;
+import com.tw.Player;
 
 public class Call implements Action {
     @Override
