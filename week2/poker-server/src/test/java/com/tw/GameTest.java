@@ -8,7 +8,6 @@ import com.tw.action.Check;
 import com.tw.action.Fold;
 import com.tw.action.Raise;
 import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

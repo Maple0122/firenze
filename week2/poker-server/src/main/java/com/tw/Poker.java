@@ -6,8 +6,6 @@ import java.util.Random;
 
 @Getter
 public class Poker {
-    private static final String[] TYPES = new String[]{"梅花", "方块", "红桃", "黑桃"};
-    private static final String[] NUMBERS = new String[]{"A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3", "2"};
     private final String type;
     private final String number;
 
@@ -23,12 +21,12 @@ public class Poker {
 
     private String generateNumber() {
         int index = new Random().nextInt(13);
-        return NUMBERS[index];
+        return Number.values()[index].getNumber();
     }
 
     private String generateType() {
         int index = new Random().nextInt(4);
-        return TYPES[index];
+        return Type.values()[index].getType();
     }
 
     @Override
