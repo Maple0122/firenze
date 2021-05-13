@@ -11,7 +11,6 @@ import com.tw.rule.Straight;
 import com.tw.rule.StraightFlush;
 import com.tw.rule.ThreeOfAKind;
 import com.tw.rule.TwoPairs;
-import static java.util.Map.Entry.comparingByValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,14 +18,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Rule {
-    private final List<CompareRule> allRules;
-    private final Map<Integer, Integer> compareResult;
+    public static final int NOT_MATCH_RULE = 0;
+    private final List<CompareRule> allRules = new ArrayList<>();
+    private final Map<Integer, Integer> compareResult = new HashMap<>();
 
     public Rule() {
-        this.compareResult = new HashMap<>();
-        this.allRules = new ArrayList<>();
         allRules.addAll(Arrays.asList(new RoyalFlush(),
                 new StraightFlush(),
                 new FourOfAKind(),
@@ -39,27 +38,19 @@ public class Rule {
                 new HighCard()));
     }
 
-    public List<Integer> compare(Map<Integer, List<Poker>> selectedPoker) {
-        List<Integer> winnerIds = new ArrayList<>();
-        selectedPoker.forEach((key, value) -> {
-            Integer ranking = allRules.stream()
-                    .map(rule -> rule.getOrder(value))
-                    .filter(order -> order > 0)
-                    .findFirst()
-                    .orElse(0);
-            if (ranking > 0) {
-                compareResult.put(key, ranking);
-            }
-        });
-        Map.Entry<Integer, Integer> maxEntry = compareResult.entrySet().stream().min(comparingByValue()).orElse(null);
-        if (maxEntry == null) {
+    public List<Integer> compare(Map<Integer, List<Poker>> selectedPokerMap) {
+        selectedPokerMap.forEach((key, value) -> allRules.stream()
+                .map(rule -> rule.getOrder(value))
+                .filter(ranking -> ranking > 0)
+                .findFirst()
+                .ifPresent(ranking -> compareResult.put(key, ranking)));
+        int ranking = compareResult.values().stream().mapToInt(Integer::intValue)
+                .min().orElse(NOT_MATCH_RULE);
+        if (ranking == NOT_MATCH_RULE) {
             return Collections.emptyList();
         }
-        compareResult.forEach((k, v) -> {
-            if (maxEntry.getValue().equals(v)) {
-                winnerIds.add(k);
-            }
-        });
-        return winnerIds;
+        return compareResult.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(ranking))
+                .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 }

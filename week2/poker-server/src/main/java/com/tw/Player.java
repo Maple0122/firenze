@@ -13,7 +13,6 @@ public class Player {
     private final Integer initWager;
     private Integer remainWager;
     private Status status;
-    private Integer potWhenAllIn;
 
     public Player(Integer id, Integer initWager, Game game) {
         this.id = id;
@@ -27,11 +26,11 @@ public class Player {
         Integer bid = action.execute(this);
         wage(bid);
         game.putInPot(bid);
-        game.deal();
         game.nextRound();
+        game.isOver();
     }
 
-    private void wage(Integer bid) {
+    public void wage(Integer bid) {
         remainWager -= bid;
     }
 }

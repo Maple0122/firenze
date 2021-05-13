@@ -1,7 +1,6 @@
 package com.tw;
 
 import static com.tw.Status.INACTIVE;
-import com.tw.action.AllIn;
 import com.tw.action.Bet;
 import com.tw.action.Call;
 import com.tw.action.Check;
@@ -37,14 +36,14 @@ public class GameTest {
     }
 
     @Test
-    void should_is_1_when_player_a_bet_given_min_wager() {
+    void should_return_1_pot_when_player_a_bet_1_given_players() {
         assertThat(game.getPot()).isEqualTo(0);
         a.execute(new Bet());
         assertThat(game.getPot()).isEqualTo(1);
     }
 
     @Test
-    void should_is_3_when_player_a_bet_and_player_b_raise_given_min_wager() {
+    void should_return_3_pot_and_current_bid_is_2_when_player_a_bet_1_and_player_b_raise_2_given_players() {
         assertThat(game.getPot()).isEqualTo(0);
         a.execute(new Bet());
         assertThat(game.getPot()).isEqualTo(1);
@@ -54,63 +53,48 @@ public class GameTest {
     }
 
     @Test
-    void should_enter_next_round_when_bet_same_wager_given_min_wager() {
+    void should_return_3_pot_and_enter_next_round_when_all_players_bet_same_wager_given_players() {
         assertThat(game.getRound()).isEqualTo(Round.PREFLOP);
         a.execute(new Bet());
         b.execute(new Bet());
         c.execute(new Bet());
         assertThat(game.getRound()).isEqualTo(Round.FLOP);
         assertThat(game.getPot()).isEqualTo(3);
-        a.execute(new Bet());
-        assertThat(game.getRound()).isEqualTo(Round.FLOP);
     }
 
     @Test
-    void should_enter_next_round_when_player_b_raise_given_min_wager() {
+    void should_enter_next_round_when_player_b_raise_2_player_a_call_given_players() {
         assertThat(game.getRound()).isEqualTo(Round.PREFLOP);
         a.execute(new Bet());
         b.execute(new Raise(2));
         c.execute(new Bet());
-        assertThat(game.getPot()).isEqualTo(5);
         assertThat(game.getRound()).isEqualTo(Round.PREFLOP);
         a.execute(new Call());
-        assertThat(game.getPot()).isEqualTo(6);
         assertThat(game.getRound()).isEqualTo(Round.FLOP);
-        assertThat(game.getCurrentBid()).isEqualTo(0);
     }
 
     @Test
-    void should_inactive_when_player_a_fold_given_min_wager() {
+    void should_return_0_pot_and_player_a_is_inactive_when_player_a_fold_given_player_a() {
         a.execute(new Fold());
         assertThat(a.getStatus()).isEqualTo(INACTIVE);
         assertThat(game.getPot()).isEqualTo(0);
     }
 
     @Test
-    void should_enter_next_round_and_not_increase_pot_when_all_players_check_given_min_wager() {
+    void should_enter_next_round_when_all_players_check_given_players() {
         assertThat(game.getRound()).isEqualTo(Round.PREFLOP);
         a.execute(new Bet());
         b.execute(new Bet());
         c.execute(new Bet());
         assertThat(game.getRound()).isEqualTo(Round.FLOP);
-        assertThat(game.getPot()).isEqualTo(3);
         a.execute(new Check());
         b.execute(new Check());
         c.execute(new Check());
-        assertThat(game.getPot()).isEqualTo(3);
         assertThat(game.getRound()).isEqualTo(Round.TURN);
     }
 
     @Test
-    void should_is_10_when_player_a_all_in_given_min_wager() {
-        assertThat(game.getPot()).isEqualTo(0);
-        a.execute(new AllIn());
-        assertThat(game.getPot()).isEqualTo(10);
-        assertThat(game.getCurrentBid()).isEqualTo(10);
-    }
-
-    @Test
-    void should_checkout_3_when_player_a_and_b_both_fold_given_min_wager() {
+    void should_player_c_win_3_bonus_when_player_a_and_player_b_both_fold_given_players() {
         a.execute(new Bet());
         b.execute(new Bet());
         c.execute(new Bet());
@@ -120,11 +104,11 @@ public class GameTest {
         b.execute(new Fold());
         assertThat(game.getPot()).isEqualTo(3);
         assertThat(game.getWinnerIds().get(0)).isEqualTo(C_ID);
-        assertThat(game.checkout(c)).isEqualTo(3);
+        assertThat(game.checkout()).isEqualTo(3);
     }
 
     @Test
-    void should_checkout_12_when_player_a_b_and_c_both_bet_given_min_wager() {
+    void should_player_b_win_12_bonus_when_all_players_bet_given_players() {
         Map<Integer, List<Poker>> selectedPoker = new HashMap<>();
         selectedPoker.put(A_ID, asList(new Poker("黑桃", "8"),
                 new Poker("红桃", "8"),
@@ -158,11 +142,11 @@ public class GameTest {
         game.shutDown(selectedPoker);
         assertThat(game.getPot()).isEqualTo(12);
         assertThat(game.getWinnerIds().get(0)).isEqualTo(B_ID);
-        assertThat(game.checkout(b)).isEqualTo(12);
+        assertThat(game.checkout()).isEqualTo(12);
     }
 
     @Test
-    void should_checkout_6_when_player_a_b_and_c_both_bet_given_min_wager() {
+    void should_player_b_win_6_bonus_and_player_c_win_6_bonus_when_all_players_bet_given_players() {
         Map<Integer, List<Poker>> selectedPoker = new HashMap<>();
         selectedPoker.put(A_ID, asList(new Poker("黑桃", "8"),
                 new Poker("红桃", "8"),
@@ -197,7 +181,7 @@ public class GameTest {
         assertThat(game.getPot()).isEqualTo(12);
         assertThat(game.getWinnerIds().get(0)).isEqualTo(B_ID);
         assertThat(game.getWinnerIds().get(1)).isEqualTo(C_ID);
-        assertThat(game.checkout(b)).isEqualTo(6);
-        assertThat(game.checkout(c)).isEqualTo(6);
+        assertThat(game.checkout()).isEqualTo(6);
+        assertThat(game.checkout()).isEqualTo(6);
     }
 }

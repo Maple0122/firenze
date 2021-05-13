@@ -12,7 +12,6 @@ import com.tw.rule.ThreeOfAKind;
 import com.tw.rule.TwoPairs;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
