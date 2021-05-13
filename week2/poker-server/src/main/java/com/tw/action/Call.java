@@ -5,11 +5,10 @@ import com.tw.Player;
 
 public class Call implements Action {
     @Override
-    public void execute(Player player) {
-        Game game = player.getGame();
+    public void execute(Game game, Player player) {
         Integer currentBid = game.getCurrentBid();
-        Integer previousBid = game.getPreviousBid(player.getId());
-        game.wage(player.getId(), currentBid);
+        Integer previousBid = game.getPreviousBid(player);
+        game.wage(player, currentBid);
         game.putInPot(currentBid - previousBid);
     }
 

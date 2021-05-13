@@ -1,7 +1,8 @@
 package com.tw.action;
 
+import com.tw.Game;
 import com.tw.Player;
 
 public interface Action {
-    void execute(Player player);
+    void execute(Game game, Player player);
 }
