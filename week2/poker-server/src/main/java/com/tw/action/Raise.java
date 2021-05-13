@@ -9,10 +9,10 @@ public class Raise implements Action {
     private final Integer wager;
 
     @Override
-    public Integer execute(Player player) {
+    public void execute(Player player) {
         Game game = player.getGame();
         game.setCurrentBid(wager);
         game.wage(player.getId(), wager);
-        return wager;
+        game.putInPot(wager);
     }
 }

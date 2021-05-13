@@ -6,11 +6,9 @@ import static com.tw.Status.INACTIVE;
 
 public class Fold implements Action {
     @Override
-    public Integer execute(Player player) {
+    public void execute(Player player) {
         Game game = player.getGame();
         player.setStatus(INACTIVE);
-        game.getRoundWager().remove(player.getId());
-        return 0;
+        game.inactive(player);
     }
-
 }

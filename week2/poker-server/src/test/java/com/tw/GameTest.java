@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 public class GameTest {
-    private static final int INIT_WAGER = 100;
     private static final int MIN_WAGER = 1;
     private static final int PLAYER_SIZE = 3;
     public static final int A_ID = 1;
@@ -30,9 +29,9 @@ public class GameTest {
     @BeforeEach
     public void setup() {
         game = new Game(PLAYER_SIZE, MIN_WAGER);
-        a = new Player(A_ID, 10, game);
-        b = new Player(B_ID, INIT_WAGER, game);
-        c = new Player(C_ID, INIT_WAGER, game);
+        a = new Player(A_ID, game);
+        b = new Player(B_ID, game);
+        c = new Player(C_ID, game);
     }
 
     @Test
@@ -102,6 +101,7 @@ public class GameTest {
         assertThat(game.getPot()).isEqualTo(3);
         a.execute(new Fold());
         b.execute(new Fold());
+        game.shutDown(new HashMap<>());
         assertThat(game.getPot()).isEqualTo(3);
         assertThat(game.getWinnerIds().get(0)).isEqualTo(C_ID);
         assertThat(game.checkout()).isEqualTo(3);

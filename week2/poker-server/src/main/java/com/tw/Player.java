@@ -10,27 +10,24 @@ import lombok.Setter;
 public class Player {
     private final Integer id;
     private final Game game;
-    private final Integer initWager;
-    private Integer remainWager;
     private Status status;
 
-    public Player(Integer id, Integer initWager, Game game) {
+    public Player(Integer id, Game game) {
         this.id = id;
-        this.initWager = initWager;
-        this.remainWager = initWager;
         this.game = game;
         this.status = ACTIVE;
     }
 
     public void execute(Action action) {
-        Integer bid = action.execute(this);
-        wage(bid);
-        game.putInPot(bid);
-        game.nextRound();
-        game.isOver();
+        action.execute(this);
+        boolean nextRound = game.nextRound();
+        if (nextRound) {
+            game.resetRoundWager();
+            game.setMinWager(game.getCurrentBid());
+            game.resetCurrentBid();
+            game.deal();
+        }
+        game.checkGameIsOver();
     }
 
-    public void wage(Integer bid) {
-        remainWager -= bid;
-    }
 }

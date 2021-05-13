@@ -1,60 +1,92 @@
 package com.tw;
 
-import static java.util.Arrays.asList;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
 
 @Getter
 @Setter
 public class Game {
-    private final Map<Integer, Integer> roundWager = new HashMap<>();
-    private Map<Integer, List<Poker>> privatePokers = new HashMap<>();
-    private List<Poker> publicPokers = new ArrayList<>();
-    private List<Integer> winnerIds = new ArrayList<>();
+    private Map<Integer, Integer> roundWager;
+    private Map<Integer, List<Poker>> privatePokers;
+    private List<Poker> publicPokers;
+    private List<Integer> winnerIds;
     private Integer minWager;
     private Integer currentBid;
     private Round round;
     private Integer pot;
-    private Rule rule = new Rule();
-    private boolean isOver;
+    private Boolean isOver;
 
     public Game(Integer playerSize, Integer minWager) {
-        startGame(playerSize);
+        checkPlayerSize(playerSize);
+        this.roundWager = new HashMap<>();
+        this.privatePokers = new HashMap<>();
+        this.publicPokers = new ArrayList<>();
+        this.winnerIds = new ArrayList<>();
         this.minWager = minWager;
         this.currentBid = minWager;
         this.round = Round.PREFLOP;
         this.pot = 0;
+        this.isOver = false;
+        initGameAndDealBlindPoker(playerSize);
     }
 
-    private void startGame(Integer playerSize) {
-        if (playerSize < 2 || playerSize > 10) {
-            throw new RuntimeException("Player size is 2 to 10");
-        }
+    private void initGameAndDealBlindPoker(Integer playerSize) {
         Stream.iterate(1, id -> id + 1).limit(playerSize).forEach(id -> {
             roundWager.put(id, null);
             privatePokers.put(id, asList(new Poker(), new Poker()));
         });
     }
 
-    public void nextRound() {
-        if (!round.isLastRound() && nextTurn()) {
-            round = Round.values()[round.ordinal() + 1];
-            reset();
-            deal();
+    private void checkPlayerSize(Integer playerSize) {
+        if (playerSize < 2 || playerSize > 10) {
+            throw new RuntimeException("Player size is 2 to 10");
         }
     }
 
-    public void shutDown(Map<Integer, List<Poker>> selectedPokerMap) {
-        if (isOver && roundWager.size() > 1) {
-            this.winnerIds.addAll(rule.compare(selectedPokerMap));
+    public boolean nextRound() {
+        if (!this.isOver && roundWager.values().stream().allMatch(wager -> currentBid.equals(wager))) {
+            round = Round.values()[round.ordinal() + 1];
+            return true;
         }
+        return false;
+    }
+
+    public void shutDown(Map<Integer, List<Poker>> selectedPokerMap) {
+        if (!isOver) {
+            return;
+        }
+        if (this.roundWager.size() == 1) {
+            this.winnerIds.add(this.roundWager.keySet().stream().findFirst().orElse(null));
+        } else {
+            this.winnerIds.addAll(Rule.compare(selectedPokerMap));
+        }
+    }
+
+    public void deal() {
+        int limit = round.equals(Round.FLOP) ? 3 : 1;
+        publicPokers.addAll(Stream.generate(Poker::new).limit(limit).collect(Collectors.toList()));
+    }
+
+    public void resetRoundWager() {
+        roundWager.keySet().forEach(id -> roundWager.put(id, null));
+    }
+
+    public void checkGameIsOver() {
+        this.isOver = roundWager.size() == 1 || Objects.equals(round, Round.RIVER);
+    }
+
+    public void wage(Integer playerId, Integer wager) {
+        getRoundWager().put(playerId, wager);
+    }
+
+    public Integer getPreviousBid(Integer playerId) {
+        return getRoundWager().get(playerId);
     }
 
     public Integer checkout() {
@@ -65,44 +97,11 @@ public class Game {
         this.pot += bid;
     }
 
-    public void isOver() {
-        if (getRoundWager().size() == 1) {
-            Integer winnerId = getRoundWager().keySet().stream().findFirst().orElse(null);
-            getWinnerIds().add(winnerId);
-            this.isOver = true;
-        }
-        if (round.isLastRound() && nextTurn()) {
-            this.isOver = true;
-        }
+    public void resetCurrentBid() {
+        this.currentBid = 0;
     }
 
-    private void deal() {
-        publicPokers.addAll(round.equals(Round.FLOP) ? asList(new Poker(), new Poker(), new Poker()) :
-                Collections.singletonList(new Poker()));
-    }
-
-    private void reset() {
-        roundWager.keySet().forEach(id -> roundWager.put(id, null));
-        setMinWager(getCurrentBid());
-        setCurrentBid(0);
-    }
-
-    private boolean nextTurn() {
-        return roundWager.values().stream().allMatch(wager -> currentBid.equals(wager));
-    }
-
-    public void wage(Integer playerId, Integer wager) {
-        getRoundWager().put(playerId, wager);
-    }
-
-    public Integer getCurrentBid() {
-        if (this.currentBid < this.minWager) {
-            this.currentBid = this.minWager;
-        }
-        return this.currentBid;
-    }
-
-    public Integer getPreviousBid(Integer playerId) {
-        return getRoundWager().get(playerId);
+    public void inactive(Player player) {
+        getRoundWager().remove(player.getId());
     }
 }
