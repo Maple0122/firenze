@@ -12,6 +12,7 @@ public class Bet implements Action {
         Integer currentBid = game.getCurrentBid();
         game.wage(player, currentBid);
         game.putInPot(currentBid);
+        game.awaiting(player);
     }
 
 }

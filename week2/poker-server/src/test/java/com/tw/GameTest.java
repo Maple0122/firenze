@@ -1,6 +1,10 @@
 package com.tw;
 
-import com.tw.action.*;
+import com.tw.action.Bet;
+import com.tw.action.Call;
+import com.tw.action.Check;
+import com.tw.action.Fold;
+import com.tw.action.Raise;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -88,10 +92,10 @@ public class GameTest {
         assertThat(game.getPot()).isEqualTo(3);
         game.execute(new Fold());
         game.execute(new Fold());
-        game.shutDown(new HashMap<>());
+        assertThat(game.getOver()).isTrue();
+        assertThat(game.checkout(new HashMap<>())).isEqualTo(3);
         assertThat(game.getPot()).isEqualTo(3);
         assertThat(game.getWinnerIds().get(0)).isEqualTo(C_ID);
-        assertThat(game.checkout()).isEqualTo(3);
     }
 
     @Test
@@ -126,10 +130,10 @@ public class GameTest {
         game.execute(new Bet());
         game.execute(new Bet());
         game.execute(new Bet());
-        game.shutDown(selectedPoker);
+        assertThat(game.getOver()).isTrue();
+        assertThat(game.checkout(selectedPoker)).isEqualTo(12);
         assertThat(game.getPot()).isEqualTo(12);
         assertThat(game.getWinnerIds().get(0)).isEqualTo(B_ID);
-        assertThat(game.checkout()).isEqualTo(12);
     }
 
     @Test
@@ -164,11 +168,10 @@ public class GameTest {
         game.execute(new Bet());
         game.execute(new Bet());
         game.execute(new Bet());
-        game.shutDown(selectedPoker);
+        assertThat(game.getOver()).isTrue();
+        assertThat(game.checkout(selectedPoker)).isEqualTo(6);
         assertThat(game.getPot()).isEqualTo(12);
         assertThat(game.getWinnerIds().get(0)).isEqualTo(B_ID);
         assertThat(game.getWinnerIds().get(1)).isEqualTo(C_ID);
-        assertThat(game.checkout()).isEqualTo(6);
-        assertThat(game.checkout()).isEqualTo(6);
     }
 }

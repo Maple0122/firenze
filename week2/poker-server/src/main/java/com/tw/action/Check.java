@@ -8,5 +8,6 @@ public class Check implements Action {
     public void execute(Game game, Player player) {
         int wager = 0;
         game.wage(player, wager);
+        game.awaiting(player);
     }
 }

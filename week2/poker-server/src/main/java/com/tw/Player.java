@@ -13,5 +13,4 @@ public class Player {
     public Player(Integer id) {
         this.id = id;
     }
-
 }

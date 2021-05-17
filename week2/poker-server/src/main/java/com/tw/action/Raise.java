@@ -13,5 +13,6 @@ public class Raise implements Action {
         game.setCurrentBid(wager);
         game.wage(player, wager);
         game.putInPot(wager);
+        game.awaiting(player);
     }
 }

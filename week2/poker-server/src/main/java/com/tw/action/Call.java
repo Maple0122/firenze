@@ -10,6 +10,7 @@ public class Call implements Action {
         Integer previousBid = game.getPreviousBid(player);
         game.wage(player, currentBid);
         game.putInPot(currentBid - previousBid);
+        game.awaiting(player);
     }
 
 }
